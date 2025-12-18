@@ -180,6 +180,32 @@ pub struct BitVector {
 }
 
 impl BitVector {
+    pub fn from_slice(slice: &[usize]) -> Self {
+        let n_ones = slice.iter().map(|x| x.count_ones() as usize).sum();
+        let n_bits = slice.len() * std::mem::size_of::<usize>() * 8;
+
+        let mut data = Vec::<DataLine>::with_capacity(
+            slice.len() * std::mem::size_of::<usize>().div_ceil(std::mem::size_of::<DataLine>()),
+        );
+        let chunks = slice.as_chunks::<8>();
+        data.extend(chunks.0.iter().map(|chunk| DataLine {
+            words: unsafe { std::mem::transmute(*chunk) },
+        }));
+        if !chunks.1.is_empty() {
+            let mut last_line = DataLine::default();
+            for (i, &val) in chunks.1.iter().enumerate() {
+                last_line.words[i] = val as u64;
+            }
+            data.push(last_line);
+        }
+
+        Self {
+            n_bits,
+            n_ones,
+            data: data.to_vec().into_boxed_slice(),
+        }
+    }
+
     /// Accesses `len` bits, with 1 <= `len` <= 64, starting at position `index`.
     ///
     /// Returns [`None`] if `index`+`len` is out of bounds,
