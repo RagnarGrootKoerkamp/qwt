@@ -112,12 +112,7 @@ impl RSWide {
         Self {
             bv,
             superblock_metadata: superblock_metadata.into_boxed_slice(),
-            select_samples: select_samples
-                .into_iter()
-                .map(|x| x.into_boxed_slice())
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap(),
+            select_samples: Default::default(),
             n_zeros,
         }
     }
