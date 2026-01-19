@@ -114,12 +114,7 @@ impl<const B_SIZE: usize> RSSupport for RSSupportPlain<B_SIZE> {
 
         Self {
             superblocks: superblocks.into_boxed_slice(),
-            select_samples: select_samples
-                .into_iter()
-                .map(|sample| sample.into_boxed_slice())
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap(), // all this just to convert Vecs into boxed slices (and because we cannot collect into an array directly)
+            select_samples: Default::default(), // all this just to convert Vecs into boxed slices (and because we cannot collect into an array directly)
         }
     }
 
